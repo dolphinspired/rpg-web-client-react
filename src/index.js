@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./components/App.jsx";
+import PhaserComponent from "./components/PhaserComponent.jsx";
 import playGame from "./phaser/scene";
 
 //console.log(App);
@@ -17,6 +17,6 @@ export const config = {
 const game = new Phaser.Game(config);
 
 ReactDOM.render(
-  <App />,
+  <PhaserComponent />,
   document.getElementById("root") || document.createElement("div")
 );
