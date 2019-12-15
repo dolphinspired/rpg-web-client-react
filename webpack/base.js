@@ -14,6 +14,12 @@ module.exports = {
     path: path.resolve("dist"),
     filename: "index_bundle.js"
   },
+  devServer: {
+    contentBase: path.resolve(__dirname, 'dist'),
+    https: true,
+    cert: 'cert/localhost.crt',
+    key: 'cert/localhost.key'
+  },
   module: {
     rules: [
       {
@@ -51,5 +57,16 @@ module.exports = {
       filename: "index.html",
       inject: "body"
     })
-  ]
+  ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
+  }
 };
