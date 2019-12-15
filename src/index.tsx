@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import React from "react";
 import ReactDOM from "react-dom";
-import PhaserComponent from "./components/PhaserComponent.jsx";
+import PhaserComponent from "./components/PhaserComponent";
 import playGame from "./phaser/scene";
 
 //console.log(App);

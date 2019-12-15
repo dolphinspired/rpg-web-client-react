@@ -6,7 +6,10 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 module.exports = {
   mode: "development",
   devtool: "eval-source-map",
-  entry: "./src/index.js", //do we need this?
+  entry: "./src/index.tsx", //do we need this?
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json']
+  },
   output: {
     path: path.resolve("dist"),
     filename: "index_bundle.js"
@@ -18,14 +21,12 @@ module.exports = {
         use: [{ loader: "style-loader" }, { loader: "css-loader" }]
       },
       {
-        test: /\.js$/,
+        test: /\.ts(x?)$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
+        use: "ts-loader"
       },
       {
-        test: /\.jsx?$/,
+        test: /\.js(x?)$/,
         exclude: /node_modules/,
         use: "babel-loader"
       },
