@@ -9,7 +9,7 @@ export class SocketService {
     return this;
   }
 
-  public on<T>(eventName: string): Observable<T> {
+  public on(eventName: string): Observable<any> {
     return fromEvent(this.socket, eventName);
   }
 

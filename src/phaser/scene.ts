@@ -7,16 +7,30 @@ interface ChatMessage {
   message: string;
 }
 
+interface ErrorMessage {
+  message: string;
+}
+
+interface SessionMessage {
+  message: string;
+}
+
 function socketeering() {
   const sock = new SocketService();
   sock.init();
   (window as any)['sock'] = sock.socket;
 
-  sock.on<ChatMessage>('message').subscribe((m: ChatMessage) => {
-    console.log('[message]'+JSON.stringify(m))
+  sock.on('message').subscribe((m: ChatMessage) => {
+    console.log('[message]'+JSON.stringify(m));
+  });
+  sock.on('errors').subscribe((m: ErrorMessage) => {
+    console.error(`[Error] ${m.message}`);
+  });
+  sock.on('session').subscribe((m: SessionMessage) => {
+    console.log(`[Session] ${m.message}`);
   });
   sock.on('getdata').subscribe((b: any) => {
-    console.log('[getdata]'+JSON.stringify(b))
+    console.log('[getdata]'+JSON.stringify(b));
   })
 }
 
