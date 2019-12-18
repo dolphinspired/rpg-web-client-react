@@ -29,6 +29,7 @@ class playGame extends Phaser.Scene {
   }
 
   create() {
+    this.chatbox.create();
     this.socketeering(); // experimental socket stuff
 
     const logo = this.add.image(400, 150, "logo");
@@ -41,7 +42,7 @@ class playGame extends Phaser.Scene {
       yoyo: true,
       loop: -1
     });
-    (window as any)['chat'] = () => this.chatbox;
+    (window as any)['chat'] = this.chatbox;
   }
   update() {
     this.chatbox.update();
@@ -52,7 +53,6 @@ class playGame extends Phaser.Scene {
     (window as any)['sock'] = sock.socket;
 
     sock.on('message').subscribe((m: ChatMessage) => {
-      console.log(`[${m.author}] ${m.message}`);
       this.chatbox.push(`[${m.author}] ${m.message}`);
     });
     sock.on('errors').subscribe((m: ErrorMessage) => {
