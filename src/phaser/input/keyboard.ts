@@ -1,6 +1,6 @@
 import keycoder from 'keycoder';
 
-const keycodes = Phaser.Input.Keyboard.KeyCodes;
+const pk = Phaser.Input.Keyboard.KeyCodes;
 
 export class Keyboard {
   constructor(private scene: Phaser.Scene) {}
@@ -10,30 +10,58 @@ export class Keyboard {
 
   init() {
     this.scene.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-      this.buffer.push(event);
+      if (event.keyCode === pk.BACKSPACE) {
+        event.preventDefault();
+        this.buffer.popEvent();
+      } else if (!event.ctrlKey) {
+        event.preventDefault();
+        this.buffer.push(event);
+      }
     });
   }
 }
 
 export class KeyboardBuffer {
-  private keyCodes: number[] = [];
+  private events: KeyboardEvent[] = [];
   private str: string = "";
 
-  push(event: KeyboardEvent) {
-    this.keyCodes.push(event.keyCode);
+  push(event: KeyboardEvent): void {
+    this.events.push(event);
     const char = keycoder.eventToCharacter(event);
     if (char) {
       this.str += char;
     }
   }
-  read(): number[] {
-    return this.keyCodes;
+  popEvent(): KeyboardEvent | undefined {
+    if (this.events.length === 0) {
+      return undefined;
+    }
+    const event = this.events.pop();
+    const char = keycoder.eventToCharacter(event);
+    if (char) {
+      this.str = this.str.substr(0, this.str.length - 1);
+    }
+    return event;
+  }
+  popString(): string {
+    if (this.events.length === 0) {
+      return "";
+    }
+    const event = this.events.pop();
+    const char = keycoder.eventToCharacter(event);
+    if (char) {
+      this.str = this.str.substr(0, this.str.length - 1);
+    }
+    return char || "";
+  }
+  readEvents(): KeyboardEvent[] {
+    return this.events;
   }
   readString(): string {
     return this.str;
   }
-  flush(): number[] {
-    const ret = this.read();
+  flushEvents(): KeyboardEvent[] {
+    const ret = this.readEvents();
     this.reset();
     return ret;
   }
@@ -44,7 +72,7 @@ export class KeyboardBuffer {
   }
 
   private reset() {
-    this.keyCodes = [];
+    this.events = [];
     this.str = "";
   }
 }

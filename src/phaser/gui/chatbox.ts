@@ -26,6 +26,13 @@ export class Chatbox {
     const lp = this.getLinePos(1);
     this.userInput = this.scene.add.text(lp.x, lp.y, "", this.font);
     this.keyboard.init();
+    this.scene.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+      if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.ENTER) {
+        const cmd = this.keyboard.buffer.flushString();
+        if (!cmd) return;
+        this.push(`[Command] ${cmd}`);
+      }
+    });
   }
   preUpdate(time: number, delta: number): void {
     this.currentTime = time;
