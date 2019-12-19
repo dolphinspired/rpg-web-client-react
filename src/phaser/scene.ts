@@ -50,11 +50,9 @@ class playGame extends Phaser.Scene {
   }
   socketeering() {
     const sock = new SocketService();
-    sock.init();
     (window as any)['sock'] = sock;
 
     const store = new ObservableStore();
-    store.init();
     (window as any)['store'] = store;
 
     store.observe('message').subscribe((m: ChatMessage) => {

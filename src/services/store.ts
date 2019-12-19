@@ -16,14 +16,15 @@ type SocketMessage = {
 export class ObservableStore {
   private debug = true;
   private store = new Map<string, SubjectWithValue>();
-  private socket = new SocketService();
+  private socket?: SocketService;
 
-  init(): ObservableStore {
-    this.socket.init();
-    this.socket.on(globalSubject).subscribe((m: SocketMessage) => {
-      this.pushValue(m.subject, m.payload);
-    });
-    return this;
+  private init(): void {
+    if (!this.socket) {
+      this.socket = new SocketService();
+      this.socket.on(globalSubject).subscribe((m: SocketMessage) => {
+        this.pushValue(m.subject, m.payload);
+      });
+    }
   }
 
   observe<T = any>(name: string): Observable<T> {
@@ -50,6 +51,7 @@ export class ObservableStore {
   }
 
   private getOrCreate(name: string): SubjectWithValue {
+    this.init();
     let swv: SubjectWithValue;
 
     if (this.store.has(name)) {
