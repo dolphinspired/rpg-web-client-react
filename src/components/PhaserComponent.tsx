@@ -30,7 +30,7 @@ function clamp(val: number, min: number, max: number) {
   return val < min ? min : val > max ? max : val;
 }
 
-export default class App extends React.Component<PhaserProps> {
+export default class PhaserComponent extends React.Component<PhaserProps> {
   private containerId: string;
   private game?: Phaser.Game;
 
