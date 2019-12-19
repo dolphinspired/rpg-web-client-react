@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import logoImg from "../assets/logo.png";
 import { SocketService } from "../services/socket";
 import { Chatbox } from './gui/chatbox';
+import { ObservableStore } from '../services/store';
 
 interface ChatMessage {
   author: string;
@@ -50,23 +51,30 @@ class playGame extends Phaser.Scene {
   socketeering() {
     const sock = new SocketService();
     sock.init();
-    (window as any)['sock'] = sock.socket;
+    (window as any)['sock'] = sock;
 
-    sock.on('message').subscribe((m: ChatMessage) => {
+    const store = new ObservableStore();
+    store.init();
+    (window as any)['store'] = store;
+
+    store.observe('message').subscribe((m: ChatMessage) => {
       this.chatbox.push(`[${m.author}] ${m.message}`);
     });
-    sock.on('errors').subscribe((m: ErrorMessage) => {
+    store.observe('errors').subscribe((m: ErrorMessage) => {
       this.chatbox.push(`[Error] ${m.message}`);
     });
-    sock.on('session').subscribe((m: SessionMessage) => {
+    store.observe('session').subscribe((m: SessionMessage) => {
       this.chatbox.push(`[Session] ${m.message}`);
     });
-    sock.on('pringles').subscribe((m: ChatMessage) => {
+    store.observe('pringles').subscribe((m: ChatMessage) => {
       this.chatbox.push(`[Ping] ${m.message}`);
     });
-    sock.on('getdata').subscribe((b: any) => {
+    store.observe('getdata').subscribe((b: any) => {
       console.log('[getdata]'+JSON.stringify(b));
     });
+
+    sock.emit('pringles');
+    store.pushValue('pringles',{message: 'via store'});
   }
 }
 
