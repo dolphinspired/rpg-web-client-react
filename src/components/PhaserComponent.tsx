@@ -1,6 +1,8 @@
 import React from "react";
 
 import playGame from "../phaser/scene";
+import { IdService } from "../services";
+import { clamp, parseIntOrDefault } from '../phaser/util';
 
 type PhaserProps = {
   width?: string;
@@ -11,32 +13,13 @@ type PhaserProps = {
   maxHeight?: string;
 }
 
-let idCounter = 0;
-
-function parseIntOrDefault(val: string | undefined, def: number): number {
-  if (val === undefined || val === "") {
-    return def;
-  }
-
-  var int = parseInt(val, 10);
-  if (isNaN(int)) {
-    return def;
-  }
-
-  return int;
-}
-
-function clamp(val: number, min: number, max: number) {
-  return val < min ? min : val > max ? max : val;
-}
-
 export default class PhaserComponent extends React.Component<PhaserProps> {
   private containerId: string;
   private game?: Phaser.Game;
 
   constructor(props: PhaserProps) {
     super(props);
-    this.containerId = `phaser-container-${++idCounter}`;
+    this.containerId = `phaser-container-${IdService.next()}`;
   }
 	render() {
 		return (
