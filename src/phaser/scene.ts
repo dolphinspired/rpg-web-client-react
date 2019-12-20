@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import logoImg from "../assets/logo.png";
 import { SocketService } from "../services/socket";
 import { Chatbox } from './gui/chatbox';
-import { ObservableStore } from '../services/store';
+import { ObservableStore, CommandService } from '../services';
 
 interface ChatMessage {
   author: string;
@@ -19,10 +19,12 @@ interface SessionMessage {
 
 class playGame extends Phaser.Scene {
   private chatbox: Chatbox;
+  private commander: CommandService;
 
   constructor() {
     super("PlayGame");
     this.chatbox = new Chatbox(this);
+    this.commander = new CommandService();
   }
 
   preload() {
@@ -34,6 +36,22 @@ class playGame extends Phaser.Scene {
     this.socketeering(); // experimental socket stuff
 
     const logo = this.add.image(400, 150, "logo");
+
+    this.add.text(600, 200, "Ping Server")
+      .setInteractive()
+      .on('pointerdown', () => this.commander.run('sock pringles'));
+    this.add.text(600, 300, "Create Session")
+      .setInteractive()
+      .on('pointerdown', () => this.commander.run('open tarp board-test fed278'));
+    this.add.text(600, 350, "Close Session")
+      .setInteractive()
+      .on('pointerdown', () => this.commander.run('close'));
+    this.add.text(600, 450, "Join Session")
+      .setInteractive()
+      .on('pointerdown', () => this.commander.run('join tarp fed279'));
+    this.add.text(600, 500, "Leave Session")
+      .setInteractive()
+      .on('pointerdown', () => this.commander.run('leave'))
 
     this.tweens.add({
       targets: logo,
