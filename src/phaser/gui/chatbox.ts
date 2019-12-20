@@ -21,6 +21,7 @@ export class Chatbox {
   private newMessages: { timestamp: number, message: string }[] = [];
 
   private currentTime: number;
+  private histIndex?: number;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -33,9 +34,22 @@ export class Chatbox {
     const lp = this.getLinePos(1);
     this.userInput = this.scene.add.text(lp.x, lp.y, "", this.font);
 
-    this.keyboard.on(key(pk.BACKSPACE), () => this.buffer.popChar());
-    this.keyboard.on(key(pk.ENTER), () => this.buffer.flush());
-    this.keyboard.on(printable(), (e: KeyboardEvent) => this.buffer.push(e));
+    this.keyboard.on(pk.BACKSPACE, () => this.buffer.popChar());
+    this.keyboard.on(pk.ENTER, () => this.buffer.flush());
+    this.keyboard.on(printable(), (e: KeyboardEvent) => {
+      this.buffer.push(e);
+      this.histIndex = undefined;
+    });
+    this.keyboard.on(pk.UP, () => {
+      if (this.histIndex === undefined) this.histIndex = -1;
+      this.histIndex = this.buffer.loadHistory(++this.histIndex);
+    });
+    this.keyboard.on(pk.DOWN, () => {
+      if (this.histIndex === undefined) return;
+      if (this.histIndex === 0) return this.buffer.clear();
+      this.histIndex = this.buffer.loadHistory(--this.histIndex);
+    });
+
     this.buffer.onFlushString().subscribe((str: string) => {
       if (!str) return;
       if (str.startsWith('/')) {
