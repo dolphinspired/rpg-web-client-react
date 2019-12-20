@@ -4,25 +4,53 @@ import { ObservableStore, IdService } from '../../services';
 
 const pk = Phaser.Input.Keyboard.KeyCodes;
 
+export type KeyMatchFunction = (event: KeyboardEvent) => boolean;
+export type KeyHandlerFunction = (event: KeyboardEvent) => void;
+
+type KeyTest = {
+  match: KeyMatchFunction;
+  handler: KeyHandlerFunction;
+}
+
+export function key(key: number): KeyMatchFunction {
+  return e => e.keyCode === key;
+}
+
+export function shift(key: number): KeyMatchFunction {
+  return e => e.shiftKey && e.keyCode === key;
+}
+
+export function ctrl(key: number): KeyMatchFunction {
+  return e => e.ctrlKey && e.keyCode === key;
+}
+
+export function printable(): KeyMatchFunction {
+  return e => !e.ctrlKey && !!keycoder.eventToCharacter(e);
+}
+
 export class Keyboard {
   constructor(private scene: Phaser.Scene) {}
 
-  private _buffer = new KeyboardBuffer();
-  get buffer() { return this._buffer };
+  private didInit = false;
+  private tests: KeyTest[] = [];
 
-  init() {
+  private init() {
+    if (this.didInit) return;
+
     this.scene.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-      if (event.keyCode === pk.BACKSPACE) {
-        event.preventDefault();
-        this.buffer.popChar();
-      } else if (event.keyCode == pk.ENTER) {
-        event.preventDefault();
-        this.buffer.flush();
-      } else if (!event.ctrlKey) {
-        event.preventDefault();
-        this.buffer.push(event);
-      }
+      this.tests.forEach(test => {
+        if (test.match(event)) {
+          event.preventDefault();
+          test.handler(event);
+        }
+      })
     });
+    this.didInit = true;
+  }
+
+  on(match: KeyMatchFunction, handler: KeyHandlerFunction) {
+    this.init();
+    this.tests.push({ match, handler });
   }
 }
 
@@ -62,7 +90,7 @@ export class KeyboardBuffer {
 
     do {
       // Continue popping events...
-      const event = this.events.pop();
+      const event = this.popEvent();
       if (!event) {
         // If no events can be popped for some reason, quit immediately
         return char;

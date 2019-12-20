@@ -14,7 +14,7 @@ type SocketMessage = {
 }
 
 export class ObservableStore {
-  private debug = true;
+  private debug = false;
   private store = new Map<string, SubjectWithValue>();
   private socket?: SocketService;
 

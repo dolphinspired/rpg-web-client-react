@@ -1,4 +1,6 @@
-import { Keyboard } from "../input/keyboard";
+import { Keyboard, key, printable, KeyboardBuffer } from '../input/keyboard';
+
+const pk = Phaser.Input.Keyboard.KeyCodes;
 
 export class Chatbox {
   public bufferSize = 10;
@@ -9,6 +11,7 @@ export class Chatbox {
 
   private scene: Phaser.Scene;
   private keyboard: Keyboard;
+  private buffer: KeyboardBuffer;
 
   private font = { fontFamily: "Courier New, sans-serif", fontSize: this.fontSize + "px", color: "#FFFFFF" };
   private userInput?: Phaser.GameObjects.Text;
@@ -20,24 +23,27 @@ export class Chatbox {
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.keyboard = new Keyboard(scene);
+    this.buffer = new KeyboardBuffer();
     this.currentTime = Date.now();
   }
   create() {
     const lp = this.getLinePos(1);
     this.userInput = this.scene.add.text(lp.x, lp.y, "", this.font);
-    this.keyboard.init();
-    this.keyboard.buffer.onFlushString().subscribe((str: string) => {
+
+    this.keyboard.on(key(pk.BACKSPACE), () => this.buffer.popChar());
+    this.keyboard.on(key(pk.ENTER), () => this.buffer.flush());
+    this.keyboard.on(printable(), (e: KeyboardEvent) => this.buffer.push(e));
+    this.buffer.onFlushString().subscribe((str: string) => {
       if (!str) return;
       this.push(`[Command] ${str}`);
     });
   }
-  preUpdate(time: number, delta: number): void {
-    this.currentTime = time;
-  }
   update() {
+    this.currentTime = Date.now();
+
     // Write the current keyboard input buffer (user input) to the bottom line
     if (this.userInput) {
-      this.userInput.text = this.keyboard.buffer.readString();
+      this.userInput.text = this.buffer.readString();
       this.userInput.update();
     }
 
