@@ -41,8 +41,8 @@ export class Chatbox {
       if (str.startsWith('/')) {
         const cmd = str.substr(1, str.length);
         const result = this.commander.run(cmd);
-        if (!result.found) {
-          this.push(`Invalid command: ${result.args._[0]}`);
+        if (result.error) {
+          this.push(`[Error] ${result.error.message}`);
         }
       } else {
         this.push(`[Chat] ${str}`);
