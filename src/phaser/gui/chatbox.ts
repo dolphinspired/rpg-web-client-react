@@ -1,4 +1,5 @@
 import { Keyboard, key, printable, KeyboardBuffer } from '../input/keyboard';
+import { CommandService } from '../../services';
 
 const pk = Phaser.Input.Keyboard.KeyCodes;
 
@@ -12,6 +13,7 @@ export class Chatbox {
   private scene: Phaser.Scene;
   private keyboard: Keyboard;
   private buffer: KeyboardBuffer;
+  private commander: CommandService;
 
   private font = { fontFamily: "Courier New, sans-serif", fontSize: this.fontSize + "px", color: "#FFFFFF" };
   private userInput?: Phaser.GameObjects.Text;
@@ -25,6 +27,7 @@ export class Chatbox {
     this.keyboard = new Keyboard(scene);
     this.buffer = new KeyboardBuffer();
     this.currentTime = Date.now();
+    this.commander = new CommandService();
   }
   create() {
     const lp = this.getLinePos(1);
@@ -35,7 +38,15 @@ export class Chatbox {
     this.keyboard.on(printable(), (e: KeyboardEvent) => this.buffer.push(e));
     this.buffer.onFlushString().subscribe((str: string) => {
       if (!str) return;
-      this.push(`[Command] ${str}`);
+      if (str.startsWith('/')) {
+        const cmd = str.substr(1, str.length);
+        const result = this.commander.run(cmd);
+        if (!result.found) {
+          this.push(`Invalid command: ${result.args._[0]}`);
+        }
+      } else {
+        this.push(`[Chat] ${str}`);
+      }
     });
   }
   update() {
