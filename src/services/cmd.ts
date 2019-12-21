@@ -1,5 +1,5 @@
 import parser from 'yargs-parser';
-import { SocketService } from '.';
+import { SocketService, AuthService } from '.';
 
 export type CommandHandler = (args: parser.Arguments) => void;
 
@@ -7,12 +7,13 @@ let didInit = false;
 const commandMap = new Map<string, CommandHandler>();
 
 let sock: SocketService;
+let authService: AuthService;
 
 export class CommandService {
   private init() {
     if (didInit) return;
-
     sock = new SocketService();
+    authService = new AuthService();
     this.on('sock', socket);
     this.on('open', opensession);
     this.on('close', closesession);
@@ -99,9 +100,9 @@ function signup(args: parser.Arguments): void {
 function login(args: parser.Arguments): void {
   const user = args._[1];
   const pass = args._[2];
-  sock.emit('login', { user, pass });
+  authService.login(user, pass);
 }
 
 function logout(args: parser.Arguments): void {
-  sock.emit('logout');
+  authService.logout();
 }

@@ -2,33 +2,29 @@ import Phaser from "phaser";
 import logoImg from "../assets/logo.png";
 import { SocketService } from "../services/socket";
 import { Chatbox } from './gui/chatbox';
-import { ObservableStore, CommandService } from '../services';
+import { AuthService, ObservableStore, CommandService } from '../services';
 
-interface ChatMessage {
-  author: string;
-  message: string;
-}
-
-interface ErrorMessage {
-  message: string;
-}
-
-interface SessionMessage {
+interface ConsoleMessage {
   message: string;
 }
 
 class playGame extends Phaser.Scene {
   private chatbox: Chatbox;
   private commander: CommandService;
+  private authService: AuthService;
 
   constructor() {
     super("PlayGame");
     this.chatbox = new Chatbox(this);
     this.commander = new CommandService();
+    this.authService = new AuthService();
   }
 
   preload() {
     this.load.image("logo", logoImg);
+    setTimeout(() => {
+      this.authService.auth();
+    }, 1000);
   }
 
   create() {
@@ -62,6 +58,7 @@ class playGame extends Phaser.Scene {
       loop: -1
     });
     // (window as any)['chat'] = this.chatbox;
+
   }
   update() {
     this.chatbox.update();
@@ -73,10 +70,10 @@ class playGame extends Phaser.Scene {
     const store = new ObservableStore();
     // (window as any)['store'] = store;
 
-    store.observe('errors').subscribe((m: ErrorMessage) => {
+    store.observe('errors').subscribe((m: ConsoleMessage) => {
       this.chatbox.push(`[Error] ${m.message}`);
     });
-    store.observe('console').subscribe((m: ChatMessage) => {
+    store.observe('console').subscribe((m: ConsoleMessage) => {
       this.chatbox.push(m.message);
     });
     store.observe('getdata').subscribe((b: any) => {
