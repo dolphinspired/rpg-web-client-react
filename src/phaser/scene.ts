@@ -61,36 +61,27 @@ class playGame extends Phaser.Scene {
       yoyo: true,
       loop: -1
     });
-    (window as any)['chat'] = this.chatbox;
+    // (window as any)['chat'] = this.chatbox;
   }
   update() {
     this.chatbox.update();
   }
   socketeering() {
     const sock = new SocketService();
-    (window as any)['sock'] = sock;
+    // (window as any)['sock'] = sock;
 
     const store = new ObservableStore();
-    (window as any)['store'] = store;
+    // (window as any)['store'] = store;
 
-    store.observe('message').subscribe((m: ChatMessage) => {
-      this.chatbox.push(`[${m.author}] ${m.message}`);
-    });
     store.observe('errors').subscribe((m: ErrorMessage) => {
       this.chatbox.push(`[Error] ${m.message}`);
     });
-    store.observe('session').subscribe((m: SessionMessage) => {
-      this.chatbox.push(`[Session] ${m.message}`);
-    });
-    store.observe('pringles').subscribe((m: ChatMessage) => {
-      this.chatbox.push(`[Ping] ${m.message}`);
+    store.observe('console').subscribe((m: ChatMessage) => {
+      this.chatbox.push(m.message);
     });
     store.observe('getdata').subscribe((b: any) => {
       console.log('[getdata]'+JSON.stringify(b));
     });
-
-    sock.emit('pringles');
-    store.pushValue('pringles',{message: 'via store'});
   }
 }
 

@@ -18,6 +18,9 @@ export class CommandService {
     this.on('close', closesession);
     this.on('join', joinsession);
     this.on('leave', leavesession);
+    this.on('signup', signup);
+    this.on('login', login);
+    this.on('logout', logout);
     didInit = true;
   }
   run(command: string): { args: parser.Arguments, error?: Error } {
@@ -85,4 +88,20 @@ function joinsession(args: parser.Arguments): void {
 
 function leavesession(args: parser.Arguments): void {
   sock.emit('leave-session');
+}
+
+function signup(args: parser.Arguments): void {
+  const user = args._[1];
+  const pass = args._[2];
+  sock.emit('signup', { user, pass });
+}
+
+function login(args: parser.Arguments): void {
+  const user = args._[1];
+  const pass = args._[2];
+  sock.emit('login', { user, pass });
+}
+
+function logout(args: parser.Arguments): void {
+  sock.emit('logout');
 }
