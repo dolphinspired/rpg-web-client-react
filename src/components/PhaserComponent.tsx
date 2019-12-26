@@ -1,6 +1,6 @@
 import React from "react";
 
-import playGame from "../phaser/scene";
+import { playGame } from "../phaser/scenes";
 import { IdService } from "../services";
 import { clamp, parseIntOrDefault } from '../phaser/util';
 

@@ -1,14 +1,14 @@
 import Phaser from "phaser";
-import logoImg from "../assets/logo.png";
-import { SocketService } from "../services/socket";
-import { Chatbox } from './gui/chatbox';
-import { AuthService, ObservableStore, CommandService } from '../services';
+import logoImg from "../../assets/logo.png";
+import { SocketService } from "../../services/socket";
+import { Chatbox } from '../gui/chatbox';
+import { AuthService, ObservableStore, CommandService } from '../../services';
 
 interface ConsoleMessage {
   message: string;
 }
 
-class playGame extends Phaser.Scene {
+export class playGame extends Phaser.Scene {
   private chatbox: Chatbox;
   private commander: CommandService;
   private authService: AuthService;
@@ -81,5 +81,3 @@ class playGame extends Phaser.Scene {
     });
   }
 }
-
-export default playGame;
