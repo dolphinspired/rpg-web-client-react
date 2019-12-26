@@ -1,7 +1,9 @@
 import io from 'socket.io-client';
 import { container, DependencyContainer } from 'tsyringe';
 
+import * as c from './commands';
 import * as s from './services';
+import { CommandController } from './commands/core';
 
 export const tokens = {
   auth: 'auth',
@@ -20,4 +22,12 @@ export function registerAppServices(): DependencyContainer {
   container.registerSingleton(tokens.socket, s.SocketServiceIO);
   container.registerSingleton(tokens.store, s.ObservableStore);
   return container;
+}
+
+export function getResolvedCommandControllers(): CommandController[] {
+  return [
+    container.resolve(c.AccountController),
+    container.resolve(c.SessionController),
+    container.resolve(c.SocketController),
+  ]
 }
