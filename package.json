@@ -65,10 +65,12 @@
     "react-redux": "^7.0.2",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
+    "reflect-metadata": "^0.1.13",
     "rxjs": "^6.5.3",
     "socket.io-client": "^2.3.0",
     "style-loader": "^1.0.0",
     "styled-components": "^4.4.1",
+    "tsyringe": "^4.0.1",
     "yargs-parser": "^16.1.0"
   },
   "babel": {
