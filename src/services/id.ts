@@ -1,10 +1,15 @@
 let id = 0;
 
-export class IdService {
-  static next(): number {
-    return ++id;
+export class IdServiceIncremental implements IdService {
+  next(): string {
+    return (++id).toString();
   }
-  next(): number {
-    return ++id;
+  make(base: string) {
+    return base + '-' + this.next();
   }
+}
+
+export interface IdService {
+  next(): string;
+  make(base: string): string;
 }

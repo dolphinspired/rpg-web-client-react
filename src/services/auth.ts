@@ -1,47 +1,48 @@
 import cookies from 'js-cookie';
+import { inject, injectable } from 'tsyringe';
 
 import { ObservableStore, SocketService } from '.';
-
-let didInit = false;
-let store: ObservableStore;
-let socket: SocketService;
 
 type AuthResponse = {
   token: string;
   expires: number;
 }
 
-function init() {
-  if (didInit) return;
-  socket = new SocketService();
-  store = new ObservableStore();
-  store.observe('auth').subscribe((a: AuthResponse) => {
-    cookies.set('auth', a);
-  });
-  didInit = true;
-}
+@injectable()
+export class AuthServiceSocket implements AuthService {
+  constructor(
+    @inject('socket') private socket: SocketService,
+    @inject('store') private store: ObservableStore,
+  ) {
+    // todo: abstract this away to whatever is listening for this socket message
+    this.store.observe('auth').subscribe((a: AuthResponse) => {
+      cookies.set('auth', a);
+    });
+  }
 
-export class AuthService {
   login(user: string, pass: string) {
-    init();
-    socket.emit('login', { user, pass });
+    this.socket.emit('login', { user, pass });
   }
   logout() {
-    init();
     cookies.remove('auth');
-    socket.emit('logout');
+    this.socket.emit('logout');
   }
   auth() {
-    init();
     const cookie = cookies.getJSON('auth') as AuthResponse;
     if (cookie.expires < Date.now()) {
       return;
     }
-    socket.emit('login', { token: cookie.token });
+    this.socket.emit('login', { token: cookie.token });
   }
   refresh() {
-    init();
     const cookie = cookies.getJSON('auth') as AuthResponse;
-    socket.emit('refresh', { token: cookie.token });
+    this.socket.emit('refresh', { token: cookie.token });
   }
+}
+
+export interface AuthService {
+  login(user: string, pass: string): void;
+  logout(): void;
+  auth(): void;
+  refresh(): void;
 }

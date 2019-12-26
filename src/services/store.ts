@@ -1,5 +1,6 @@
 import { Observable, Subject } from "rxjs";
 import { SocketService } from "./socket";
+import { inject, injectable } from "tsyringe";
 
 const globalSubject = 'ws-rpg';
 
@@ -13,18 +14,18 @@ type SocketMessage = {
   payload: any;
 }
 
+@injectable()
 export class ObservableStore {
   private debug = false;
   private store = new Map<string, SubjectWithValue>();
-  private socket?: SocketService;
 
-  private init(): void {
-    if (!this.socket) {
-      this.socket = new SocketService();
-      this.socket.on(globalSubject).subscribe((m: SocketMessage) => {
-        this.pushValue(m.subject, m.payload);
-      });
-    }
+  constructor(
+    @inject('socket') private socket: SocketService
+  ) {
+    // Any events that the server emits to this "global subject" will be captured and re-emitted by the store
+    this.socket.on(globalSubject).subscribe((m: SocketMessage) => {
+      this.pushValue(m.subject, m.payload);
+    });
   }
 
   observe<T = any>(name: string): Observable<T> {
@@ -51,7 +52,6 @@ export class ObservableStore {
   }
 
   private getOrCreate(name: string): SubjectWithValue {
-    this.init();
     let swv: SubjectWithValue;
 
     if (this.store.has(name)) {

@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import "reflect-metadata";
 
 import PhaserComponent from "./components/PhaserComponent";
 import TitleComponent from "./components/TitleComponent";
