@@ -1,5 +1,5 @@
 import cookies from 'js-cookie';
-import { inject, injectable } from 'tsyringe';
+import { inject, injectable } from '../di';
 
 import { ObservableStore, SocketService } from '.';
 
@@ -29,7 +29,7 @@ export class AuthServiceSocket implements AuthService {
   }
   auth() {
     const cookie = cookies.getJSON('auth') as AuthResponse;
-    if (cookie.expires < Date.now()) {
+    if (!cookie || cookie.expires < Date.now()) {
       return;
     }
     this.socket.emit('login', { token: cookie.token });

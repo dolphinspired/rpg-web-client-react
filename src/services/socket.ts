@@ -1,5 +1,5 @@
 import { fromEvent, Observable } from 'rxjs';
-import { inject, injectable } from 'tsyringe';
+import { inject, injectable } from '../di';
 
 @injectable()
 export class SocketServiceIO implements SocketService {

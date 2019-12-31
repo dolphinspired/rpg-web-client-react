@@ -1,5 +1,6 @@
 import { CommandHandlerOptions } from './command';
 import { CommandService } from '../../services';
+import { injectable } from '../../di';
 
 export type CommandHandlerInitializer = {
   method: string;
@@ -7,6 +8,7 @@ export type CommandHandlerInitializer = {
   options?: CommandHandlerOptions;
 }
 
+@injectable()
 export abstract class CommandController {
   private handlers?: CommandHandlerInitializer[];
 

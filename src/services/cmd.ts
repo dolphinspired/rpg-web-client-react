@@ -1,5 +1,6 @@
 import parser from 'yargs-parser';
 
+import { injectable } from '../di';
 import { CommandHandlerFunction, CommandArgs } from '../commands/core';
 
 function toCommandArgs(yargs: parser.Arguments): CommandArgs {
@@ -14,6 +15,7 @@ function toCommandArgs(yargs: parser.Arguments): CommandArgs {
   return { cmd, positional, named };
 }
 
+@injectable()
 export class CommandServiceYargs implements CommandService {
   private commandMap = new Map<string, CommandHandlerFunction>();
 

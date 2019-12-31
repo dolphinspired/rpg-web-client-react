@@ -1,6 +1,6 @@
 import React from "react";
 
-export default class TitleComponent extends React.Component<{ title: string }> {
+export class TitleComponent extends React.Component<{ title: string }> {
 	render() {
 		return (
 			<div style={{ textAlign: "center" }}>

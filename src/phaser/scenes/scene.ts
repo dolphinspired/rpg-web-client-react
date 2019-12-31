@@ -1,23 +1,24 @@
 import Phaser from "phaser";
 import logoImg from "../../assets/logo.png";
-import { SocketService } from "../../services/socket";
 import { Chatbox } from '../gui/chatbox';
-import { AuthService, ObservableStore, CommandService } from '../../services';
+import * as s from '../../services';
+import * as di from '../../di';
 
 interface ConsoleMessage {
   message: string;
 }
 
+const { lazyInject } = di.getAppServicesDecorators();
+
 export class playGame extends Phaser.Scene {
   private chatbox: Chatbox;
-  private commander: CommandService;
-  private authService: AuthService;
+  @lazyInject('auth') private authService: s.AuthService;
+  @lazyInject('cmd') private commander: s.CommandService;
+  @lazyInject('store') private store: s.ObservableStore;
 
   constructor() {
     super("PlayGame");
     this.chatbox = new Chatbox(this);
-    this.commander = new CommandService();
-    this.authService = new AuthService();
   }
 
   preload() {
@@ -64,19 +65,13 @@ export class playGame extends Phaser.Scene {
     this.chatbox.update();
   }
   socketeering() {
-    const sock = new SocketService();
-    // (window as any)['sock'] = sock;
-
-    const store = new ObservableStore();
-    // (window as any)['store'] = store;
-
-    store.observe('errors').subscribe((m: ConsoleMessage) => {
+    this.store.observe('errors').subscribe((m: ConsoleMessage) => {
       this.chatbox.push(`[Error] ${m.message}`);
     });
-    store.observe('console').subscribe((m: ConsoleMessage) => {
+    this.store.observe('console').subscribe((m: ConsoleMessage) => {
       this.chatbox.push(m.message);
     });
-    store.observe('getdata').subscribe((b: any) => {
+    this.store.observe('getdata').subscribe((b: any) => {
       console.log('[getdata]'+JSON.stringify(b));
     });
   }

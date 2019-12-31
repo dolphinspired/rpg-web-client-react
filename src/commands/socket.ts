@@ -1,7 +1,7 @@
-import { inject, injectable } from "tsyringe";
+import { inject, injectable } from '../di';
 
-import { CommandController, Command, CommandArgs } from "./core";
-import { SocketService } from "../services";
+import { CommandController, Command, CommandArgs } from './core';
+import { SocketService } from '../services';
 
 @injectable()
 export class SocketController extends CommandController {

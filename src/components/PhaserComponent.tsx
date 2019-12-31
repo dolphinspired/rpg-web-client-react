@@ -3,6 +3,7 @@ import React from "react";
 import { playGame } from "../phaser/scenes";
 import { IdService } from "../services";
 import { clamp, parseIntOrDefault } from '../phaser/util';
+import * as di from '../di';
 
 type PhaserProps = {
   width?: string;
@@ -13,13 +14,16 @@ type PhaserProps = {
   maxHeight?: string;
 }
 
-export default class PhaserComponent extends React.Component<PhaserProps> {
+const { lazyInject } = di.getAppServicesDecorators();
+
+export class PhaserComponent extends React.Component<PhaserProps> {
   private containerId: string;
   private game?: Phaser.Game;
+  @lazyInject(di.tokens.id) private idService: IdService;
 
   constructor(props: PhaserProps) {
     super(props);
-    this.containerId = `phaser-container-${IdService.next()}`;
+    this.containerId = this.idService.make('phaser-container');
   }
 	render() {
 		return (

@@ -1,5 +1,8 @@
+import { injectable } from '../di';
+
 let id = 0;
 
+@injectable()
 export class IdServiceIncremental implements IdService {
   next(): string {
     return (++id).toString();

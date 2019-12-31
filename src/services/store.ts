@@ -1,6 +1,6 @@
 import { Observable, Subject } from "rxjs";
 import { SocketService } from "./socket";
-import { inject, injectable } from "tsyringe";
+import { inject, injectable } from "../di";
 
 const globalSubject = 'ws-rpg';
 

@@ -1,9 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "reflect-metadata";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'reflect-metadata';
 
-import PhaserComponent from "./components/PhaserComponent";
-import TitleComponent from "./components/TitleComponent";
+import { PhaserComponent, TitleComponent } from './components';
+
+import * as di from './di';
+import * as s from './services';
 
 ReactDOM.render(
   [
@@ -12,3 +14,12 @@ ReactDOM.render(
   ],
   document.getElementById("root") || document.createElement("div")
 );
+
+function startup() {
+  const container = di.registerAppServices();
+  di.getResolvedCommandControllers(container).forEach(controller => {
+    controller.initHandlers(container.get<s.CommandService>(di.tokens.cmd))
+  });
+}
+
+startup();

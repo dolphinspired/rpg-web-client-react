@@ -1,7 +1,10 @@
-import { Keyboard, key, printable, KeyboardBuffer } from '../input/keyboard';
+import { Keyboard, key, printable, KeyboardBuffer } from '../input';
 import { CommandService } from '../../services';
+import { getAppServicesDecorators } from '../../di';
 
 const pk = Phaser.Input.Keyboard.KeyCodes;
+
+const { lazyInject } = getAppServicesDecorators();
 
 export class Chatbox {
   public bufferSize = 10;
@@ -13,7 +16,7 @@ export class Chatbox {
   private scene: Phaser.Scene;
   private keyboard: Keyboard;
   private buffer: KeyboardBuffer;
-  private commander: CommandService;
+  @lazyInject('cmd') private commander: CommandService;
 
   private font = { fontFamily: "Courier New, sans-serif", fontSize: this.fontSize + "px", color: "#FFFFFF" };
   private userInput?: Phaser.GameObjects.Text;
@@ -28,7 +31,6 @@ export class Chatbox {
     this.keyboard = new Keyboard(scene);
     this.buffer = new KeyboardBuffer();
     this.currentTime = Date.now();
-    this.commander = new CommandService();
   }
   create() {
     const lp = this.getLinePos(1);
@@ -42,21 +44,23 @@ export class Chatbox {
     });
     this.keyboard.on(pk.UP, () => {
       if (this.histIndex === undefined) this.histIndex = -1;
-      this.histIndex = this.buffer.loadHistory(++this.histIndex);
+      this.histIndex = this.buffer.load(++this.histIndex);
     });
     this.keyboard.on(pk.DOWN, () => {
       if (this.histIndex === undefined) return;
       if (this.histIndex === 0) return this.buffer.clear();
-      this.histIndex = this.buffer.loadHistory(--this.histIndex);
+      this.histIndex = this.buffer.load(--this.histIndex);
     });
 
-    this.buffer.onFlushString().subscribe((str: string) => {
+    this.buffer.observeFlushString().subscribe((str: string) => {
+      this.histIndex = undefined;
       if (!str) return;
       if (str.startsWith('/')) {
         const cmd = str.substr(1, str.length);
-        const result = this.commander.run(cmd);
-        if (result.error) {
-          this.push(`[Error] ${result.error.message}`);
+        try {
+          this.commander.run(cmd);
+        } catch (e) {
+          this.push(`[Error] ${e.message}`);
         }
       } else {
         this.push(`[Chat] ${str}`);
